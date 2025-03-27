@@ -11,6 +11,7 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: "#565252", // Donkergrijze navbar
           borderTopWidth: 5, // Dikkere bovenrand
+          borderTopColor: "#8A2BE2", // Paarse rand bovenaan
           height: 60, // Verhoogde navbar voor betere uitlijning
           alignItems: "center", // Centreer alles in de navbar
         },
