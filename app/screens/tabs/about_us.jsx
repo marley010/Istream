@@ -21,9 +21,9 @@ export default function AboutUs() {
 
         {/* About Us Card */}
         <View style={styles.textBox}>
-          <Text style={styles.title}>Over Ons</Text>
+          <Text style={styles.title}>About us </Text>
           <Text style={styles.description}>
-            Onze app biedt gebruikers een platform om de nieuwste films en video's te ontdekken en bekijken, waar en wanneer ze maar willen.
+          Our app provides users with a platform to discover and watch the latest movies and videos, anytime and anywhere they want.
           </Text>
         </View>
 
@@ -76,19 +76,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E1E1E",
     padding: 25,
     borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
-    maxWidth: "90%",
+    maxWidth: "100%",
     alignItems: "center",
     marginBottom: 20, // Space between "About Us" and team member cards
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#8A2BE2",
     textAlign: "center",
     marginBottom: 12,
   },
