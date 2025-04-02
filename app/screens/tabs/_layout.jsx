@@ -11,16 +11,16 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: "#565252", // Donkergrijze navbar
           borderTopWidth: 5, // Dikkere bovenrand
-          borderTopColor: "#8A2BE2", // Paarse rand bovenaan
+          borderColor: "#b30086", // Paarse rand bovenaan
           height: 60, // Verhoogde navbar voor betere uitlijning
-          alignItems: "center", // Centreer alles in de navbar
         },
         tabBarItemStyle: {
           height: "100%", // Zorgt ervoor dat de items de volledige hoogte benutten
           justifyContent: "center",
+          top: 7.5,
           alignItems: "center",
         },
-        tabBarActiveTintColor: "#d1b3ff",
+        tabBarActiveTintColor: "#b30086",
         tabBarInactiveTintColor: "white",
         tabBarShowLabel: false, 
       }}
