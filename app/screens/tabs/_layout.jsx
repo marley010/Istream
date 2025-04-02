@@ -9,7 +9,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#565252", // Donkergrijze navbar
+          backgroundColor: "#222222", // Donkergrijze navbar
           borderTopWidth: 5, // Dikkere bovenrand
           borderColor: "#b30086", // Paarse rand bovenaan
           height: 60, // Verhoogde navbar voor betere uitlijning
@@ -21,7 +21,7 @@ export default function TabsLayout() {
           alignItems: "center",
         },
         tabBarActiveTintColor: "#b30086",
-        tabBarInactiveTintColor: "white",
+        tabBarInactiveTintColor: "#565252",
         tabBarShowLabel: false, 
       }}
     >
