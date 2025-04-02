@@ -6,6 +6,7 @@ export default function Layout() {
         <Stack.Screen name="index"/>
         <Stack.Screen name="screens/tabs/home"/>
         <Stack.Screen name="screens/MovieDetailsScreen"/>
+        <Stack.Screen name="screens/PlayerScreen"/>
     </Stack>
   )
 }

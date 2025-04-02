@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from "react";
 import { 
-  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity 
+  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Linking 
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,6 +9,8 @@ const MovieDetailScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const movie = route.params?.movie;
+
+  console.log(movie.id);
 
   // Hide the navigation bar when this screen is active
   useLayoutEffect(() => {
@@ -25,6 +27,17 @@ const MovieDetailScreen = () => {
       </View>
     );
   }
+
+
+  // Function to open YouTube Trailer
+  const openTrailer = () => {
+    if (movie.trailer_key) {
+      const youtubeURL = `https://www.youtube.com/watch?v=${movie.trailer_key}`;
+      Linking.openURL(youtubeURL).catch((err) => console.error("Failed to open URL:", err));
+    } else {
+      alert("Trailer not available");
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -54,10 +67,16 @@ const MovieDetailScreen = () => {
 
         {/* Buttons */}
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.watchButton}>
+          {/* Watch Button */}
+          <TouchableOpacity 
+            style={styles.watchButton}
+            onPress={() => navigation.navigate("screens/PlayerScreen", { id: movie.id })} // ✅ Fixed
+          >
             <Text style={styles.watchButtonText}>Watch</Text>
             <Ionicons name="play" size={18} color="white" style={styles.playIcon} />
           </TouchableOpacity>
+
+          {/* Download Button */}
           <TouchableOpacity style={styles.downloadButton}>
             <Text style={styles.downloadButtonText}>Download</Text>
             <Ionicons name="download" size={18} color="white" />
@@ -65,7 +84,7 @@ const MovieDetailScreen = () => {
         </View>
 
         {/* Trailer Button */}
-        <TouchableOpacity style={styles.trailerButton}>
+        <TouchableOpacity style={styles.trailerButton} onPress={openTrailer}>
           <Ionicons name="videocam" size={24} color="white" />
           <Text style={styles.trailerText}>Trailer</Text>
         </TouchableOpacity>
@@ -77,7 +96,7 @@ const MovieDetailScreen = () => {
         {/* Genres */}
         <Text style={styles.genreTitle}>Genre</Text>
         <Text style={styles.genreText}>
-          {movie.genre_ids?.map(id => genres[id]).join(", ") || "N/A"}
+          {movie.genreids?.map(id => genres[id]).join(", ") || "N/A"}
         </Text>
       </View>
     </ScrollView>
