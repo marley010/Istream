@@ -8,7 +8,7 @@ export default function App() {
     <View style={styles.overlay}>
       <StatusBar backgroundColor="black" barStyle="light-content" />
       <Text style={styles.text}>Welcome to Istream</Text>
-      <Pressable style={styles.pressable} onPress={() => router.push("/screens/tabs/home")}>
+      <Pressable style={styles.pressable} onPress={() => router.push("/screens/auth/register")}>
         <Text style={styles.pressableText}>Go to the app</Text>
       </Pressable>
     </View>
