@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { 
-  View, TextInput, StyleSheet, Text, FlatList, TouchableOpacity, Image 
+import React, { useState, useEffect } from "react";
+import {
+  View, TextInput, StyleSheet, Text, FlatList,
+  TouchableOpacity, Image
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,13 +10,32 @@ const SearchScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
+  const [popularMovies, setPopularMovies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Function to handle movie search
-  const searchMovies = async () => {
-    if (!searchQuery.trim()) return;  // Don't search if input is empty
+  // Fetch popular movies on mount
+  useEffect(() => {
+    fetchPopularMovies();
+  }, []);
+
+  const fetchPopularMovies = async () => {
     setLoading(true);
-    
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/movie/popular?api_key=bd25169e7ba6c2fe28a0e995bc6ed497&page=1`
+      );
+      const data = await response.json();
+      setPopularMovies(data.results || []);
+    } catch (error) {
+      console.error("Error fetching popular movies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchMovies = async () => {
+    if (!searchQuery.trim()) return;
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.themoviedb.org/3/search/movie?api_key=bd25169e7ba6c2fe28a0e995bc6ed497&query=${searchQuery}&page=1`
@@ -23,20 +43,39 @@ const SearchScreen = () => {
       const data = await response.json();
       setMovies(data.results || []);
     } catch (error) {
-      console.error("Error fetching movie data:", error);
+      console.error("Error fetching search results:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to navigate to movie detail screen
   const goToMovieDetail = (movie) => {
     navigation.navigate("screens/MovieDetailsScreen", { movie });
   };
 
+  const renderMovieItem = ({ item }) => (
+    <TouchableOpacity onPress={() => goToMovieDetail(item)} style={styles.movieItem}>
+      {item.poster_path ? (
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
+          style={styles.moviePoster}
+        />
+      ) : (
+        <View style={styles.noPoster}></View>
+      )}
+      <View style={{ flex: 1 }}>
+        <Text style={styles.movieTitle}>{item.title}</Text>
+        <Text style={styles.movieReleaseDate}>
+          {item.release_date ? new Date(item.release_date).getFullYear() : "N/A"}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const moviesToShow = searchQuery.trim() ? movies : popularMovies;
+
   return (
     <View style={styles.container}>
-      {/* Search Input */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -44,39 +83,23 @@ const SearchScreen = () => {
           placeholderTextColor="gray"
           value={searchQuery}
           onChangeText={setSearchQuery}
-          onSubmitEditing={searchMovies} // Trigger search on return key press
+          onSubmitEditing={searchMovies}
         />
         <TouchableOpacity style={styles.searchButton} onPress={searchMovies}>
           <Ionicons name="search" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
-      {/* Loading Indicator */}
-      {loading && <Text style={styles.loadingText}>Searching...</Text>}
+      {loading && <Text style={styles.loadingText}>Loading...</Text>}
 
-      {/* Display Movies */}
-      {!loading && movies.length === 0 && searchQuery && (
+      {!loading && searchQuery && movies.length === 0 && (
         <Text style={styles.noResultsText}>No results found</Text>
       )}
 
       <FlatList
-        data={movies}
+        data={moviesToShow}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => goToMovieDetail(item)} style={styles.movieItem}>
-            {/* Movie Poster */}
-            {item.poster_path ? (
-              <Image
-                source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
-                style={styles.moviePoster}
-              />
-            ) : (
-              <View style={styles.noPoster}></View> // Fallback when no poster is available
-            )}
-            <Text style={styles.movieTitle}>{item.title}</Text>
-            <Text style={styles.movieReleaseDate}>{new Date(item.release_date).getFullYear()}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={renderMovieItem}
         contentContainerStyle={styles.resultsContainer}
       />
     </View>
@@ -94,7 +117,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     alignItems: "center",
-    backgroundColor: "#222222",
     borderRadius: 8,
     paddingHorizontal: 10,
   },
@@ -106,6 +128,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderWidth: 1,
     borderRadius: 5,
+    paddingHorizontal: 10,
   },
   searchButton: {
     padding: 8,
@@ -150,7 +173,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
-    flex: 1,
   },
   movieReleaseDate: {
     color: "gray",

@@ -28,12 +28,13 @@ const MovieDetailScreen = () => {
     );
   }
 
-
   // Function to open YouTube Trailer
   const openTrailer = () => {
-    if (movie.trailer_key) {
+    if (movie.trailer_key && movie.trailer_key !== "undefined") {
       const youtubeURL = `https://www.youtube.com/watch?v=${movie.trailer_key}`;
-      Linking.openURL(youtubeURL).catch((err) => console.error("Failed to open URL:", err));
+      Linking.openURL(youtubeURL).catch((err) => 
+        console.error("Failed to open URL:", err)
+      );
     } else {
       alert("Trailer not available");
     }
@@ -70,7 +71,7 @@ const MovieDetailScreen = () => {
           {/* Watch Button */}
           <TouchableOpacity 
             style={styles.watchButton}
-            onPress={() => navigation.navigate("screens/PlayerScreen", { id: movie.id })} // ✅ Fixed
+            onPress={() => navigation.navigate("screens/PlayerScreen", { id: movie.id })}
           >
             <Text style={styles.watchButtonText}>Watch</Text>
             <Ionicons name="play" size={18} color="white" style={styles.playIcon} />
@@ -141,7 +142,12 @@ const styles = StyleSheet.create({
   overviewText: { color: "lightgray", fontSize: 14, marginTop: 5 },
 
   genreTitle: { color: "white", fontSize: 16, fontWeight: "bold", marginTop: 15 },
-  genreText: { color: "gray", fontSize: 14, marginTop: 5 }
+  genreText: { color: "gray", fontSize: 14, marginTop: 5 },
+
+  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#111" },
+  errorText: { color: 'white', fontSize: 16, marginBottom: 10 },
+  backButton: { backgroundColor: '#b30086', padding: 10, borderRadius: 5 },
+  backButtonText: { color: 'white', fontWeight: 'bold' }
 });
 
 export default MovieDetailScreen;
