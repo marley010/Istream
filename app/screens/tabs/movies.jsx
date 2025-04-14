@@ -25,7 +25,6 @@ export default function Movies() {
     let data = [];
 
     if (selectedFilter === "extended") {
-      // Laad bijv. 3 pagina's per keer voor meer films
       const page1 = await fetchPopularMovies(pageToLoad);
       const page2 = await fetchPopularMovies(pageToLoad + 1);
       const page3 = await fetchPopularMovies(pageToLoad + 2);
@@ -72,7 +71,7 @@ export default function Movies() {
   const renderMovie = ({ item }) => (
     <TouchableOpacity
       style={styles.movieCard}
-      onPress={() => navigation.navigate('MovieDetails', { movie: item })}
+      onPress={() => navigation.navigate('screens/MovieDetailsScreen', { movie: item })}
     >
       <Image
         source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
@@ -87,7 +86,7 @@ export default function Movies() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="black" barStyle="light-content" />
-      
+
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={toggleFilter} style={styles.filterButton}>
           <Text style={styles.filterText}>
