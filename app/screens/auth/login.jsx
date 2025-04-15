@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -36,6 +36,10 @@ export default function Login() {
 
     return (
         <View style={styles.overlay}>
+            {/* Logo */}
+            <Image source={require('../../../assets/images/logo.png')} style={styles.logo} />
+
+            {/* Inputs */}
             <TextInput
                 style={styles.input}
                 placeholder="Email Address"
@@ -55,10 +59,12 @@ export default function Login() {
                 onChangeText={setPassword}
             />
 
+            {/* Login Button */}
             <Pressable style={styles.pressableCreate} onPress={handleLogin}> 
                 <Text style={styles.pressableTextCreate}>LOGIN</Text>
             </Pressable>
 
+            {/* Signup Link */}
             <TouchableOpacity onPress={() => router.push('/screens/auth/register')}>
                 <Text style={styles.text}>Don't have an account? Sign up</Text>
             </TouchableOpacity>
@@ -69,32 +75,40 @@ export default function Login() {
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        justifyContent: "center",
+        justifyContent: "flex-start",
         alignItems: "center",
-        paddingTop: 350,
-        backgroundColor: "#222",  // Zelfde donkere achtergrond als HomeScreen en Register
+        paddingTop: 120,
+        backgroundColor: "#222",
     },
+    logo: {
+        width: 220,
+        height: 220,
+        resizeMode: 'contain',
+        marginBottom: 40,
+        
+    },
+    
     text: {
         paddingTop: 30,
         fontSize: 14,
-        color: "white",  // Wit voor betere zichtbaarheid
+        color: "white",
         textAlign: "center",
         textDecorationLine: "underline",
     },
     input: {
-        backgroundColor: "#333",  // Donkere invoervelden
+        backgroundColor: "#333",
         width: 300,
         paddingVertical: 10,
         borderRadius: 20, 
         marginVertical: 10,
         textAlign: "center",
         fontSize: 16,
-        color: "white",  // Witte tekst voor contrast
+        color: "white",
         borderWidth: 1,
-        borderColor: "#555",  // Lichte rand voor betere zichtbaarheid
+        borderColor: "#555",
     },
     pressableCreate: {
-        backgroundColor: "#b30086", // Zelfde paarse kleur als Register en HomeScreen
+        backgroundColor: "#b30086",
         width: 300, 
         paddingVertical: 10,
         borderRadius: 20, 

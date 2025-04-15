@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,7 +26,7 @@ export default function Register() {
         try {
             await AsyncStorage.setItem('user', JSON.stringify({ email, password }));
             const storedUser = await AsyncStorage.getItem('user');
-            console.log("Stored user data:", storedUser);  
+            console.log("Stored user data:", storedUser);
 
             Alert.alert("Succes", "Account is aangemaakt!", [
                 { text: "OK", onPress: () => router.push('/screens/auth/login') }
@@ -39,6 +39,9 @@ export default function Register() {
 
     return (
         <View style={styles.overlay}>
+            {/* Logo at the top */}
+            <Image source={require('../../../assets/images/logo.png')} style={styles.logo} />
+
             <TextInput
                 style={styles.input}
                 placeholder="Email Address"
@@ -67,7 +70,7 @@ export default function Register() {
                 onChangeText={setConfirmPassword}
             />
 
-            <Pressable style={styles.pressableCreate} onPress={handleRegister}> 
+            <Pressable style={styles.pressableCreate} onPress={handleRegister}>
                 <Text style={styles.pressableTextCreate}>Create Account</Text>
             </Pressable>
 
@@ -83,33 +86,39 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: 350,
-        backgroundColor: "#222",  // Zelfde donkere achtergrond als HomeScreen
+        paddingTop: 100,
+        backgroundColor: "#222",
+    },
+    logo: {
+        width: 220,
+        height: 220,
+        resizeMode: 'contain',
+        marginBottom: 40,
     },
     text: {
         paddingTop: 30,
         fontSize: 14,
-        color: "white",  // Wit voor betere zichtbaarheid
+        color: "white",
         textAlign: "center",
         textDecorationLine: "underline",
     },
     input: {
-        backgroundColor: "#333",  // Donkere invoervelden
+        backgroundColor: "#333",
         width: 300,
         paddingVertical: 10,
-        borderRadius: 20, 
+        borderRadius: 20,
         marginVertical: 10,
         textAlign: "center",
         fontSize: 16,
-        color: "white",  // Witte tekst voor contrast
+        color: "white",
         borderWidth: 1,
-        borderColor: "#555",  // Lichte rand voor betere zichtbaarheid
+        borderColor: "#555",
     },
     pressableCreate: {
-        backgroundColor: "#b30086", // Zelfde kleur als de "WATCH NOW" knop in HomeScreen
-        width: 300, 
+        backgroundColor: "#b30086",
+        width: 300,
         paddingVertical: 10,
-        borderRadius: 20, 
+        borderRadius: 20,
         marginVertical: 10,
         alignItems: "center",
     },

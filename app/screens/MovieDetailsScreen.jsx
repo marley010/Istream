@@ -47,9 +47,7 @@ const MovieDetailScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="expand" size={24} color="white" />
-        </TouchableOpacity>
+     
       </View>
 
       {/* Movie Poster */}

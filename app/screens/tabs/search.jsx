@@ -18,6 +18,17 @@ const SearchScreen = () => {
     fetchPopularMovies();
   }, []);
 
+  // Live search with debounce
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const delayDebounce = setTimeout(() => {
+        searchMovies();
+      }, 500); // Wait 500ms after user stops typing
+
+      return () => clearTimeout(delayDebounce); // Cleanup on next keystroke
+    }
+  }, [searchQuery]);
+
   const fetchPopularMovies = async () => {
     setLoading(true);
     try {
@@ -83,7 +94,6 @@ const SearchScreen = () => {
           placeholderTextColor="gray"
           value={searchQuery}
           onChangeText={setSearchQuery}
-          onSubmitEditing={searchMovies}
         />
         <TouchableOpacity style={styles.searchButton} onPress={searchMovies}>
           <Ionicons name="search" size={24} color="white" />

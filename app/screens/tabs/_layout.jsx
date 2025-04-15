@@ -14,6 +14,7 @@ export default function TabsLayout() {
           borderColor: "#b30086", // Paarse rand bovenaan
           height: 60, // Verhoogde navbar voor betere uitlijning
         },
+        headerShown: false,
         tabBarItemStyle: {
           height: "100%", // Zorgt ervoor dat de items de volledige hoogte benutten
           justifyContent: "center",
@@ -42,6 +43,7 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+    
         name="search"
         options={{ 
           tabBarIcon: ({ color }) => (

@@ -1,72 +1,69 @@
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet, Text, View, SafeAreaView, StatusBar,
-  FlatList, Image, TouchableOpacity, ActivityIndicator
+  FlatList, Image, TouchableOpacity, ActivityIndicator,
+  Modal, ScrollView
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { fetchPopularMovies } from '../../api/moviesApi';
+import { Ionicons } from '@expo/vector-icons';
+import {
+  fetchPopularMovies,
+  fetchGenres,
+  fetchMoviesByGenre
+} from '../../api/moviesApi';
 
 export default function Movies() {
   const navigation = useNavigation();
   const [movies, setMovies] = useState([]);
-  const [page, setPage] = useState(1);
+  const [popularMovies, setPopularMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [filter, setFilter] = useState("popular"); // 'popular' of 'extended'
+  const [genres, setGenres] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
 
-  React.useLayoutEffect(() => {
+  useEffect(() => {
     navigation.setOptions({ headerShown: false });
-  }, [navigation]);
+    loadInitialData();
+  }, []);
 
-  const loadMovies = async (pageToLoad = 1, selectedFilter = filter) => {
-    if (pageToLoad === 1) setLoading(true);
-    else setLoadingMore(true);
-
-    let data = [];
-
-    if (selectedFilter === "extended") {
-      const page1 = await fetchPopularMovies(pageToLoad);
-      const page2 = await fetchPopularMovies(pageToLoad + 1);
-      const page3 = await fetchPopularMovies(pageToLoad + 2);
-      data = [...page1, ...page2, ...page3];
-    } else {
-      data = await fetchPopularMovies(pageToLoad);
-    }
-
-    setMovies((prev) => {
-      const existingIds = new Set(prev.map((movie) => movie.id));
-      const filtered = data.filter((movie) => !existingIds.has(movie.id));
-      return pageToLoad === 1 ? data : [...prev, ...filtered];
-    });
-
+  const loadInitialData = async () => {
+    setLoading(true);
+    const [popular, genreList] = await Promise.all([
+      fetchPopularMovies(),
+      fetchGenres()
+    ]);
+    setPopularMovies(popular);
+    setMovies(popular);
+    setGenres(genreList);
     setLoading(false);
-    setLoadingMore(false);
   };
 
   useEffect(() => {
-    setPage(1);
-    loadMovies(1, filter);
-  }, [filter]);
-
-  const handleLoadMore = () => {
-    if (!loadingMore) {
-      const nextPage = filter === "extended" ? page + 3 : page + 1;
-      setPage(nextPage);
-      loadMovies(nextPage);
+    if (selectedGenres.length === 0) {
+      setMovies(popularMovies);
+    } else {
+      loadMoviesByGenres();
     }
+  }, [selectedGenres]);
+
+  const loadMoviesByGenres = async () => {
+    setLoading(true);
+    const allMovies = await Promise.all(
+      selectedGenres.map((genreId) => fetchMoviesByGenre(genreId))
+    );
+    const combined = allMovies.flat();
+    const uniqueMovies = Array.from(new Map(combined.map(m => [m.id, m])).values());
+    setMovies(uniqueMovies);
+    setLoading(false);
   };
 
-  const toggleFilter = () => {
-    const newFilter = filter === 'popular' ? 'extended' : 'popular';
-    setMovies([]);
-    setPage(1);
-    setFilter(newFilter);
+  const toggleGenre = (genreId) => {
+    setSelectedGenres(prev =>
+      prev.includes(genreId)
+        ? prev.filter(id => id !== genreId)
+        : [...prev, genreId]
+    );
   };
-
-  const renderFooter = () =>
-    loadingMore ? (
-      <ActivityIndicator size="small" color="#fff" style={{ margin: 10 }} />
-    ) : null;
 
   const renderMovie = ({ item }) => (
     <TouchableOpacity
@@ -87,11 +84,10 @@ export default function Movies() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="black" barStyle="light-content" />
 
-      <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={toggleFilter} style={styles.filterButton}>
-          <Text style={styles.filterText}>
-            {filter === 'popular' ? 'toon veel films' : 'toon populaire films'}
-          </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Movies</Text>
+        <TouchableOpacity onPress={() => setShowFilter(true)}>
+          <Ionicons name="filter" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -102,17 +98,41 @@ export default function Movies() {
       ) : (
         <FlatList
           data={movies}
-          keyExtractor={(item, index) =>
-            item.id ? item.id.toString() : `movie-${index}`
-          }
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderMovie}
           numColumns={3}
           contentContainerStyle={styles.listContent}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
         />
       )}
+
+      <Modal visible={showFilter} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <ScrollView contentContainerStyle={styles.modalContent}>
+            <Text style={styles.filterTitle}>Filter by Genre</Text>
+            {genres.map((genre) => (
+              <TouchableOpacity
+                key={genre.id}
+                style={styles.genreItem}
+                onPress={() => toggleGenre(genre.id)}
+              >
+                <Ionicons
+                  name={selectedGenres.includes(genre.id) ? 'checkbox' : 'square-outline'}
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={styles.genreText}>{genre.name}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity
+              onPress={() => setShowFilter(false)}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -146,18 +166,50 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  filterContainer: {
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  filterButton: {
-    backgroundColor: "#333",
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 5,
+    paddingVertical: 10,
+    alignItems: 'center',
   },
-  filterText: {
-    color: "white",
-    fontSize: 14,
+  headerTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#000000cc',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#222',
+    borderRadius: 10,
+    padding: 20,
+  },
+  filterTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  genreItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  genreText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  closeText: {
+    color: '#00f',
+    fontSize: 16,
   },
 });
